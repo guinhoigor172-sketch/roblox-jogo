@@ -1,0 +1,94 @@
+QUITA SCORE - LEIA-ME
+=====================
+
+Arquivos desta pasta:
+  index.html  = o site
+  admin.html  = painel de leitura (senha + exportacao CSV)
+  LEIA-ME.txt = este arquivo
+
+Nao use o endereco file:/// para divulgar. Use o GitHub Pages.
+
+
+PUBLICAR
+--------
+1. Settings > Pages
+2. Source: Deploy from a branch
+3. Branch: main | pasta / (root) | Save
+4. Aguarde 1 minuto e recarregue
+
+URL: https://SEU-USUARIO.github.io/NOME-DO-REPO/
+Painel: a mesma URL terminando em /admin.html
+
+
+TESTAR
+------
+Clique em "preencher com dados de teste" nas duas telas.
+CPF 529.982.247-25 e cartao 4111 1111 1111 1111 passam na validacao.
+O primeiro envio cai de proposito em "Erro 001". Clique em
+"Tentar novamente" e a tela de sucesso aparece.
+
+
+VER OS DADOS SEM BANCO
+----------------------
+Abra SUA-URL/admin.html e clique em "Ver deste navegador".
+So mostra o que foi preenchido naquele mesmo navegador.
+Serve para testar. NAO serve para divulgar.
+
+
+LIGAR NO BANCO (uso real)
+-------------------------
+Sem isso o dado fica so no navegador de quem preenche.
+
+1. Crie conta em https://supabase.com e um projeto novo
+   Regiao: South America (Sao Paulo). Plano: Free.
+2. No projeto: SQL Editor > New query
+3. Cole o SQL do supabase.sql e clique em Run
+4. Rode tambem, trocando a senha:
+   update public.quita_config set admin_pass = 'SUA-SENHA-FORTE' where id = 1;
+5. Project Settings > API: copie "Project URL" e "anon public"
+6. Abra index.html no editor e preencha:
+
+   var CONFIG = {
+     supabaseUrl:  'https://SEU-PROJETO.supabase.co',
+     supabaseAnon: 'SUA_CHAVE_ANON',
+     webhook:      '',
+     avisoTeste:   true
+   };
+
+7. Faca o mesmo no admin.html (supabaseUrl e supabaseAnon)
+8. Salve os dois arquivos e faca commit
+9. Abra admin.html, digite a senha e clique em "Carregar do banco"
+
+
+SEGURANCA
+---------
+A chave "anon" fica visivel no HTML. Isso e normal: a politica de RLS
+do banco permite que ela apenas INSIRA. Quem abrir a chave nao le nada.
+
+A leitura passa so pelo painel com senha ou pelo painel do Supabase.
+Se a senha vazar: update public.quita_config set admin_pass = 'nova';
+Nunca cole a chave service_role no HTML.
+
+
+ANTES DE DIVULGAR
+-----------------
+- Troque a senha padrao do painel
+- Se for cobrar de verdade, mude avisoTeste para false
+- O repo e publico: qualquer um ve o codigo. Nao e problema.
+- Exporte CSV de vez em quando: nao ha backup automatico
+- O plano free do Supabase pausa apos 7 dias sem acesso
+
+
+PROBLEMAS COMUNS
+----------------
+Site abre em branco
+  -> arquivo salvo com nome errado. Precisa ser index.html
+
+Envia mas nao cai no banco
+  -> CONFIG nao preenchido ou chave errada
+
+Console: new row violates row-level security policy
+  -> o SQL nao rodou completo. Rode de novo a parte da policy anon_insert.
+
+Admin diz senha invalida
+  -> rodou o update no projeto errado. Confira a URL no CONFIG.
